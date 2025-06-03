@@ -532,7 +532,50 @@ def generate_experiment_cfgs(id):
         for seed in seeds:
             cfg = config_from_vars()
             cfgs.append(cfg)
+    # -------------------------------------------------------------------------
+    # WITHOUT MIC
+    # -------------------------------------------------------------------------
+    elif id == 86:
+        # MIC ablation: same config as MIC but with mask logic disabled safely
+        seeds = [2]
+        architecture, backbone = 'hrda1-512-0.1_daformer_sepaspp', 'mitb5'
+        uda, rcs_T = 'dacs_a999_fdthings', 0.01
+        crop, rcs_min_crop = '1024x1024', 0.5 * (2 ** 2)
+        inference = 'slide'
+        plcrop = 'v2'
+
+        # Soft-disable MIC without breaking internal logic
+        mask_mode = 'separatetrgaug'
+        mask_block_size = 32
+        mask_ratio = 0
+        mask_alpha = 'same'
+        mask_pseudo_threshold = 'same'
+        mask_lambda = 0
+
+        for source, target in [
+            ('gtaHR', 'cityscapesHR'),
+        ]:
+            for seed in seeds:
+                gpu_model = 'NVIDIATITANRTX'
+                cfg = config_from_vars()
+
+                # Match original MIC config test/inference crop sizes
+                cfg['model']['test_cfg']['stride'] = [128, 128]
+                cfg['model']['test_cfg']['crop_size'] = [256, 256]
+                cfg['model']['hr_crop_size'] = (256, 256)
+
+                # Match original MIC config checkpointing/eval
+                cfg['checkpoint_config'] = dict(by_epoch=False, interval=1000, max_keep_ckpts=5)
+                cfg['evaluation'] = dict(interval=1000, metric='mIoU')
+
+                # Match original MIC config batch size
+                cfg['data']['samples_per_gpu'] = 1
+
+                import time
+                cfg['name'] = f"{time.strftime('%y%m%d_%H%M')}_exp86_nomask_s{seed}"
+                cfgs.append(cfg)
     else:
         raise NotImplementedError('Unknown id {}'.format(id))
 
     return cfgs
+
