@@ -109,7 +109,7 @@ if __name__ == '__main__':
             # Generate Config File
             cfg['name'] = f'{datetime.now().strftime("%y%m%d_%H%M")}_' \
                           f'{cfg["name"]}_{str(uuid.uuid4())[:5]}'
-            cfg['work_dir'] = os.path.join('work_dirs', exp_name, cfg['name'])
+            cfg['work_dir'] = os.path.join('work_dirs', exp_name, cfg['name']).replace('\\', '/')
             cfg['git_rev'] = get_git_hash()
             cfg['_base_'] = ['../../' + e for e in cfg['_base_']]
             cfg_out_file = f"{GEN_CONFIG_DIR}/{exp_name}/{cfg['name']}.py"

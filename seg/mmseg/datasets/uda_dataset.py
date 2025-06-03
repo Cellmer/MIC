@@ -101,9 +101,9 @@ class UDADataset(object):
             self.file_to_idx = {}
             for i, dic in enumerate(self.source.img_infos):
                 file = dic['ann']['seg_map']
-                if isinstance(self.source, CityscapesDataset):
-                    file = file.split('/')[-1]
+                file = osp.basename(file)  # Always use just the filename
                 self.file_to_idx[file] = i
+
 
     def synchronized_crop(self, s1, s2):
         if self.sync_crop_size is None:
@@ -123,7 +123,7 @@ class UDADataset(object):
     def get_rare_class_sample(self):
         c = np.random.choice(self.rcs_classes, p=self.rcs_classprob)
         f1 = np.random.choice(self.samples_with_class[c])
-        i1 = self.file_to_idx[f1]
+        i1 = self.file_to_idx[osp.basename(f1)]
         s1 = self.source[i1]
         if self.rcs_min_crop_ratio > 0:
             for j in range(10):

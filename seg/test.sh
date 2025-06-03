@@ -7,14 +7,19 @@
 
 #!/bin/bash
 
+#!/bin/bash
+
 TEST_ROOT=$1
-CONFIG_FILE="${TEST_ROOT}/*${TEST_ROOT: -1}.py"  # or .json for old configs
+CONFIG_FILE=$(find $TEST_ROOT -maxdepth 1 -name "*.py" | head -n 1)
 CHECKPOINT_FILE="${TEST_ROOT}/latest.pth"
 SHOW_DIR="${TEST_ROOT}/preds"
+
 echo 'Config File:' $CONFIG_FILE
 echo 'Checkpoint File:' $CHECKPOINT_FILE
 echo 'Predictions Output Directory:' $SHOW_DIR
-python -m tools.test ${CONFIG_FILE} ${CHECKPOINT_FILE} --eval mIoU --show-dir ${SHOW_DIR} --opacity 1
+
+python -m tools.test "$CONFIG_FILE" "$CHECKPOINT_FILE" --eval mIoU --show-dir "$SHOW_DIR" --opacity 1 --test-set
+
 
 # Uncomment the following lines to visualize the LR predictions,
 # HR predictions, or scale attentions of HRDA:

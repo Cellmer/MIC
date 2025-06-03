@@ -33,7 +33,7 @@ model = dict(
     # the context crop.
     scales=[1, 0.5],
     # Use a relative crop size of 0.5 (=512/1024) for the detail crop.
-    hr_crop_size=(512, 512),
+    hr_crop_size=(256, 256),
     # Use LR features for the Feature Distance as in the original DAFormer.
     feature_scale=0.5,
     # Make the crop coordinates divisible by 8 (output stride = 4,
@@ -45,8 +45,8 @@ model = dict(
     test_cfg=dict(
         mode='slide',
         batched_slide=True,
-        stride=[512, 512],
-        crop_size=[1024, 1024]))
+        stride=[128, 128],
+        crop_size=[256, 256]))
 data = dict(
     train=dict(
         # Rare Class Sampling
@@ -65,7 +65,7 @@ data = dict(
     # Use one separate thread/worker for data loading.
     workers_per_gpu=1,
     # Batch size
-    samples_per_gpu=2,
+    samples_per_gpu=1,
 )
 # MIC Parameters
 uda = dict(
@@ -94,10 +94,10 @@ optimizer = dict(
             norm=dict(decay_mult=0.0))))
 n_gpus = 1
 gpu_model = 'NVIDIATITANRTX'
-runner = dict(type='IterBasedRunner', max_iters=40000)
+runner = dict(type='IterBasedRunner', max_iters=5000)
 # Logging Configuration
-checkpoint_config = dict(by_epoch=False, interval=40000, max_keep_ckpts=1)
-evaluation = dict(interval=4000, metric='mIoU')
+checkpoint_config = dict(by_epoch=False, interval=1000, max_keep_ckpts=5)
+evaluation = dict(interval=1000, metric='mIoU')
 # Meta Information for Result Analysis
 name = 'gtaHR2csHR_mic_hrda_s2'
 exp = 'basic'
